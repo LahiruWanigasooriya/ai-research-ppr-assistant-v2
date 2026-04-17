@@ -1,60 +1,120 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Design tokens ─────────────────────────────────────── */
 :root {
-  --bg-base:       #0a0b10;
-  --bg-surface:    #111218;
-  --bg-elevated:   #1a1c24;
-  --bg-glass:      rgba(255,255,255,0.04);
-  --bg-glass-hov:  rgba(255,255,255,0.07);
+  /* ── Light Theme ───────────────────────────────────────── */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  
+  --border-subtle: #e5e7eb;
+  --border-strong: #d1d5db;
+  
+  --accent-primary: #6366f1;
+  --accent-secondary: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: blur(12px);
 
-  --border:        rgba(255,255,255,0.08);
-  --border-focus:  rgba(139,92,246,0.6);
-
-  --accent:        #8b5cf6;
-  --accent-light:  #a78bfa;
-  --accent-dim:    rgba(139,92,246,0.15);
-  --accent2:       #06b6d4;
-
-  --text-primary:  #f1f0f5;
-  --text-secondary:#94919e;
-  --text-muted:    #5c5869;
-
-  --user-bubble:   rgba(139,92,246,0.18);
-  --asst-bubble:   rgba(255,255,255,0.04);
-
-  --error:         #f87171;
-  --error-bg:      rgba(248,113,113,0.1);
-
-  --radius-sm:     8px;
-  --radius-md:     14px;
-  --radius-lg:     20px;
-
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.4);
-  --shadow-md:     0 8px 32px rgba(0,0,0,0.5);
-
-  --transition:    0.2s cubic-bezier(0.4,0,0.2,1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  
+  --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Reset ─────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[data-theme='dark'] {
+  /* ── Dark Theme ────────────────────────────────────────── */
+  --bg-primary: #09090b;
+  --bg-secondary: #121215;
+  --bg-tertiary: #18181b;
+  --bg-glass: rgba(9, 9, 11, 0.6);
+  
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+  
+  --border-subtle: #27272a;
+  --border-strong: #3f3f46;
+  
+  --accent-primary: #818cf8;
+  --accent-secondary: #6366f1;
+  --accent-glow: rgba(129, 140, 248, 0.12);
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5);
+  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.6);
+  
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Base Reset ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html, body, #root {
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg-base);
+  font-family: var(--font-main);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
-/* ── Scrollbar ──────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+/* ── Typography ─────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ── Scrollbars ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ── Layout Utilities ───────────────────────────────────── */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+.glow {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+

@@ -1,334 +1,112 @@
-/* Basic Reset and Root Variables */
-:root {
-  --navy-dark: #1e293b;
-  --navy-sidebar: #0f172a;
-  --white: #ffffff;
-  --grey-light: #f3f4f6;
-  --blue-user: #3b82f6;
-  --green: #22c55e;
-  --purple: #8b5cf6;
-  --red: #ef4444;
-  --text-dark: #1f2937;
-  --text-light: #9ca3af;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  color: var(--text-dark);
-  background-color: var(--grey-light);
-}
-
-.app-container {
-  display: flex;
+.app-main {
   height: 100vh;
-  width: 100vw;
-  flex-direction: column; /* Changed to column to stack banner on top */
-}
-
-/* Status Banner */
-.status-banner {
-  padding: 8px;
-  text-align: center;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: background-color 0.3s;
-  z-index: 100;
-}
-
-.status-banner.online {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-.status-banner.offline {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.app-content {
-  display: flex; /* Original flex direction for sidebar/main layout */
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   overflow: hidden;
 }
 
-/* Sidebar Styling (Upload area) */
-.sidebar {
-  width: 350px;
-  background-color: var(--navy-sidebar);
-  color: var(--white);
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.main-layout {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--white);
-  position: relative;
-}
-
-/* Header Nav */
-.header-nav {
-  padding: 15px 25px;
-  border-bottom: 1px solid var(--grey-light);
-  background-color: var(--white);
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  color: var(--blue-user);
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.back-btn:hover {
-  text-decoration: underline;
-}
-
-/* Upload Panel Specifics */
-.upload-container h2 {
-  margin-bottom: 15px;
-  font-size: 1.5rem;
-}
-
-.upload-container p {
-  color: var(--text-light);
-  margin-bottom: 30px;
-  font-size: 0.9rem;
-}
-
-.upload-box {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.file-input {
-  display: none;
-}
-
-.file-label {
-  display: block;
-  padding: 12px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.file-label:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: var(--blue-user);
-}
-
-.upload-button {
-  padding: 12px;
-  background-color: var(--blue-user);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.upload-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.status-container {
-  margin-top: 20px;
-}
-
-.status {
-  font-size: 0.85rem;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.status.success { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; }
-.status.error { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }
-.status.uploading { color: var(--blue-user); }
-
-/* Chat Window Styling */
-.chat-container {
+.container {
+  max-width: 1780px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem 1.5rem 2rem;
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.chat-header {
-  padding: 0 25px 15px;
-  color: var(--text-light);
-  font-size: 0.9rem;
-}
-
-.messages-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px 25px;
+.center-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-.message-wrapper {
-  display: flex;
-  flex-direction: column;
-  max-width: 75%;
-}
-
-.message-wrapper.user {
-  align-self: flex-end;
-}
-
-.message-wrapper.assistant {
-  align-self: flex-start;
-}
-
-.message-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: var(--text-light);
-}
-
-.user .message-label { text-align: right; }
-
-.message-bubble {
-  padding: 12px 18px;
-  border-radius: 18px;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.message-bubble.user {
-  background-color: var(--blue-user);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.message-bubble.assistant {
-  background-color: var(--grey-light);
-  color: var(--text-dark);
-  border-bottom-left-radius: 4px;
-}
-
-.message-bubble.error {
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: var(--red);
-  font-weight: 500;
-}
-
-/* Thinking Dots Animation */
-.thinking span {
-  animation: dots 1.5s infinite;
-  display: inline-block;
-  margin: 0 1px;
-}
-
-.thinking span:nth-child(2) { animation-delay: 0.2s; }
-.thinking span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes dots {
-  0% { opacity: 0.2; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-2px); }
-  100% { opacity: 0.2; transform: translateY(0); }
-}
-
-/* Controls fixed at bottom */
-.controls {
-  padding: 20px 25px 30px;
-  border-top: 1px solid var(--grey-light);
-  background-color: var(--white);
-}
-
-.input-area {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 15px;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 12px 18px;
-  border: 1px solid #d1d5db;
-  border-radius: 25px;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.input-area input:focus {
-  border-color: var(--blue-user);
-}
-
-.send-btn {
-  padding: 0 24px;
-  background-color: var(--blue-user);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.action-buttons {
-  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 3rem;
+  flex: 1;
+  text-align: center;
 }
 
-.action-buttons button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
+.hero-text h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+.hero-text p {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.chat-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Critical for inner scrolling in flexbox */
+}
+
+/* ── Common Component Styles ────────────────────────────── */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-base);
+}
+
+.card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-primary {
+  background: var(--accent-primary);
   color: white;
-  transition: opacity 0.2s;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.btn-summarize { background-color: var(--green); }
-.btn-keypoints { background-color: var(--purple); }
-.btn-clear { background-color: var(--red); }
-
-.action-buttons button:hover {
-  opacity: 0.9;
+.btn-primary:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.action-buttons button:disabled {
-  opacity: 0.5;
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
-  .app-container {
-    flex-direction: column;
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero-text h1 {
+    font-size: 2.75rem;
   }
-  .sidebar {
-    width: 100%;
-    padding: 20px;
-    height: auto;
+  .hero-text p {
+    font-size: 1.1rem;
   }
-  .message-wrapper {
-    max-width: 90%;
+  .container {
+    padding: 0 1rem 1rem 1rem;
+  }
+  .center-content {
+    margin-top: 2rem;
+    gap: 2rem;
   }
 }
