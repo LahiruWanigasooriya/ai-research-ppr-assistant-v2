@@ -1,16 +1,9 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
 
-// Load environment variables
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,42 +11,35 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Multer Setup for File Uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-const upload = multer({ storage });
+// Routes
+const aiRoutes = require('./routes/ai');
+app.use('/api', aiRoutes);
 
-// Routes placeholder
+// Root health-check route
 app.get('/', (req, res) => {
-  res.json({ message: 'AI Research Assistant API is running...' });
+  res.json({
+    message: 'Research Paper Assistant API is running.',
+    endpoints: [
+      'POST /api/upload',
+      'POST /api/chat',
+      'POST /api/summarize',
+      'POST /api/keypoints',
+      'GET  /api/history/:sessionId',
+    ],
+  });
 });
 
-// File Upload Route Example
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
-  }
-  res.json({ message: 'File uploaded successfully', file: req.file });
-});
-
-// Database Connection
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/ai-research-assistant';
+// Connect to MongoDB then start server
 mongoose
-  .connect(mongoURI)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('✅ MongoDB connected successfully');
+    console.log('✅ Connected to MongoDB');
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err);
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1);
   });
