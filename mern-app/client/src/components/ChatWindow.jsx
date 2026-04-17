@@ -118,7 +118,7 @@ const ChatWindow = ({ sessionId, filename }) => {
             <FileText size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '0.9rem', fontWeight: 600, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: 600, maxWidth: '800px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {filename}
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Analysis Session</div>
