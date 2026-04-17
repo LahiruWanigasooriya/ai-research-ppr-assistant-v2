@@ -1,121 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import UploadPanel from './components/UploadPanel';
+import ChatWindow from './components/ChatWindow';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [sessionId, setSessionId] = useState(localStorage.getItem('rh_paper_sessionId'));
+  const [filename, setFilename] = useState(localStorage.getItem('rh_paper_filename'));
+  const [isAIOnline, setIsAIOnline] = useState(null); // null = checking, true = online, false = offline
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        await axios.get('http://localhost:8000/health');
+        setIsAIOnline(true);
+      } catch (err) {
+        console.warn('AI API Health Check failed:', err.message);
+        setIsAIOnline(false);
+      }
+    };
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleUploadSuccess = (id, name) => {
+    setSessionId(id);
+    setFilename(name);
+    localStorage.setItem('rh_paper_sessionId', id);
+    localStorage.setItem('rh_paper_filename', name);
+  };
+
+  const handleReset = () => {
+    setSessionId(null);
+    setFilename(null);
+    localStorage.removeItem('rh_paper_sessionId');
+    localStorage.removeItem('rh_paper_filename');
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-container">
+      {/* 🟢 Connectivity Status Banner */}
+      <div className={`status-banner ${isAIOnline === true ? 'online' : 'offline'}`}>
+        {isAIOnline === true ? (
+          <span>🟢 AI API Connected</span>
+        ) : isAIOnline === false ? (
+          <span>🔴 AI API Offline — please run the notebook first</span>
+        ) : (
+          <span>⚪ Checking AI API Status...</span>
+        )}
+      </div>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <div className="app-content">
+        {!sessionId ? (
+          <div className="sidebar">
+            <UploadPanel onUploadSuccess={handleUploadSuccess} />
+          </div>
+        ) : (
+          <div className="main-layout">
+            <div className="header-nav">
+              <button onClick={handleReset} className="back-btn">
+                ← Upload New Paper
+              </button>
+            </div>
+            <ChatWindow sessionId={sessionId} filename={filename} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
