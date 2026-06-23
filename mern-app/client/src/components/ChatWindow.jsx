@@ -1,8 +1,52 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, List, Trash2, FileText, SendHorizontal, Loader2, User } from 'lucide-react';
+import { Send, Sparkles, List, Trash2, FileText, SendHorizontal, Loader2, User, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { sendMessage, getSummary, getKeyPoints, getChatHistory } from '../api/api';
+
+const SourceCitations = ({ sources }) => {
+  const [open, setOpen] = useState(false);
+  if (!sources || sources.length === 0) return null;
+  return (
+    <div style={{ marginTop: '0.5rem', maxWidth: '85%' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '0.4rem',
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, padding: '2px 4px',
+        }}
+      >
+        <BookOpen size={12} />
+        {sources.length} source{sources.length > 1 ? 's' : ''} cited
+        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+      </button>
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.4rem' }}>
+          {sources.map((src, i) => (
+            <div
+              key={i}
+              style={{
+                padding: '0.5rem 0.75rem',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+              }}
+            >
+              <span style={{ fontWeight: 700, color: 'var(--accent-primary)', marginRight: '6px' }}>
+                [{i + 1}]
+              </span>
+              {src.length > 200 ? src.slice(0, 200) + '…' : src}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ChatWindow = ({ sessionId, filename }) => {
   const [messages, setMessages] = useState([]);
@@ -45,7 +89,11 @@ const ChatWindow = ({ sessionId, filename }) => {
 
     try {
       const response = await sendMessage(sessionId, currentInput);
-      const assistantMessage = { role: 'assistant', content: response.data.answer };
+      const assistantMessage = {
+        role: 'assistant',
+        content: response.data.answer,
+        sources: response.data.sources || [],
+      };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -191,10 +239,10 @@ const ChatWindow = ({ sessionId, filename }) => {
                   </>
                 ) : 'Assistant'}
               </div>
-              <div 
+              <div
                 className="glass"
-                style={{ 
-                  padding: '1rem 1.25rem', 
+                style={{
+                  padding: '1rem 1.25rem',
                   borderRadius: msg.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
                   background: msg.role === 'user' ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
                   color: msg.role === 'user' ? 'white' : 'var(--text-primary)',
@@ -206,6 +254,7 @@ const ChatWindow = ({ sessionId, filename }) => {
               >
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
+              {msg.role === 'assistant' && <SourceCitations sources={msg.sources} />}
             </motion.div>
           ))}
 

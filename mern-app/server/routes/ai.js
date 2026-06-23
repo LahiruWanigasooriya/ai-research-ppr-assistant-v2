@@ -68,7 +68,8 @@ router.post('/chat', async (req, res) => {
     }
 
     const pythonRes = await axios.post(`${PYTHON_API}/chat`, { question });
-    const answer = pythonRes.data.answer;
+    const answer  = pythonRes.data.answer;
+    const sources = pythonRes.data.sources || [];
 
     // Append both turns to the Chat document
     await Chat.findOneAndUpdate(
@@ -86,7 +87,7 @@ router.post('/chat', async (req, res) => {
       { new: true }
     );
 
-    return res.json({ answer });
+    return res.json({ answer, sources });
   } catch (err) {
     console.error('[/api/chat]', err.message);
     const status = err.response?.status || 500;
@@ -169,7 +170,29 @@ router.post('/keypoints', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────
-// 5. GET /api/history/:sessionId
+// 5. POST /api/evaluate
+//    { reference, hypothesis } → ROUGE scores from Python API
+// ─────────────────────────────────────────────────────────
+router.post('/evaluate', async (req, res) => {
+  try {
+    const { reference, hypothesis } = req.body;
+    if (!reference || !hypothesis) {
+      return res.status(400).json({ error: 'reference and hypothesis are required.' });
+    }
+
+    const pythonRes = await axios.post(`${PYTHON_API}/evaluate`, { reference, hypothesis });
+    return res.json(pythonRes.data);
+  } catch (err) {
+    console.error('[/api/evaluate]', err.message);
+    const status = err.response?.status || 500;
+    return res
+      .status(status)
+      .json({ error: err.response?.data?.detail || err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// 6. GET /api/history/:sessionId
 //    Return full Chat document for a session
 // ─────────────────────────────────────────────────────────
 router.get('/history/:sessionId', async (req, res) => {

@@ -28,4 +28,8 @@ export const getChatHistory = (sessionId) => {
   return api.get(`/history/${sessionId}`);
 };
 
+export const evaluateAnswer = (reference, hypothesis) => {
+  return api.post('/evaluate', { reference, hypothesis });
+};
+
 export default api;
