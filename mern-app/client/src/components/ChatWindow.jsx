@@ -93,6 +93,8 @@ const ChatWindow = ({ sessionId, filename }) => {
         role: 'assistant',
         content: response.data.answer,
         sources: response.data.sources || [],
+        figureImages: response.data.figure_images || [],
+        questionType: response.data.question_type || '',
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -254,7 +256,32 @@ const ChatWindow = ({ sessionId, filename }) => {
               >
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
+              {msg.role === 'assistant' && msg.questionType && (
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', paddingLeft: '4px', marginTop: '2px' }}>
+                  🏷 {msg.questionType}
+                </div>
+              )}
               {msg.role === 'assistant' && <SourceCitations sources={msg.sources} />}
+              {msg.figureImages && msg.figureImages.length > 0 && (
+                <div style={{ marginTop: '0.75rem', maxWidth: '85%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', paddingLeft: '4px' }}>
+                    📊 Figures from the paper:
+                  </div>
+                  {msg.figureImages.map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt={`Figure ${i + 1}`}
+                      style={{
+                        maxWidth: '100%',
+                        borderRadius: '10px',
+                        border: '1px solid var(--border-subtle)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </motion.div>
           ))}
 
@@ -288,7 +315,7 @@ const ChatWindow = ({ sessionId, filename }) => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
             placeholder="Ask anything about the paper..."
             style={{ 
               flex: 1, 

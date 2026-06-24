@@ -67,9 +67,20 @@ router.post('/chat', async (req, res) => {
       return res.status(400).json({ error: 'sessionId and question are required.' });
     }
 
-    const pythonRes = await axios.post(`${PYTHON_API}/chat`, { question });
-    const answer  = pythonRes.data.answer;
-    const sources = pythonRes.data.sources || [];
+    // Fetch recent conversation history for memory-aware prompting
+    const existing = await Chat.findOne({ sessionId });
+    const history  = (existing?.messages || [])
+      .slice(-6)
+      .map(m => ({ role: m.role, content: m.content }));
+
+    const pythonRes = await axios.post(`${PYTHON_API}/chat`, { question, history }, {
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+    });
+    const answer        = pythonRes.data.answer;
+    const sources       = pythonRes.data.sources       || [];
+    const figure_images = pythonRes.data.figure_images || [];
+    const question_type = pythonRes.data.question_type || '';
 
     // Append both turns to the Chat document
     await Chat.findOneAndUpdate(
@@ -87,7 +98,7 @@ router.post('/chat', async (req, res) => {
       { new: true }
     );
 
-    return res.json({ answer, sources });
+    return res.json({ answer, sources, figure_images, question_type });
   } catch (err) {
     console.error('[/api/chat]', err.message);
     const status = err.response?.status || 500;
@@ -206,6 +217,19 @@ router.get('/history/:sessionId', async (req, res) => {
   } catch (err) {
     console.error('[/api/history]', err.message);
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// 7. GET /api/health
+//    Proxy Python API health check so browser avoids cross-origin call
+// ─────────────────────────────────────────────────────────
+router.get('/health', async (req, res) => {
+  try {
+    const pythonRes = await axios.get(`${PYTHON_API}/health`);
+    return res.json(pythonRes.data);
+  } catch (err) {
+    return res.status(503).json({ status: 'offline', error: err.message });
   }
 });
 

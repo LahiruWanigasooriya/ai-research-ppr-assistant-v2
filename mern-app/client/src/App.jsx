@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        await axios.get('http://localhost:8000/health');
+        await axios.get('/api/health');
         setIsAIOnline(true);
       } catch (err) {
         setIsAIOnline(false);
